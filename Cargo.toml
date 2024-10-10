@@ -1,0 +1,19 @@
+[package]
+name = "schul-cloud-api"
+version = "0.1.0"
+edition = "2021"
+authors = ["Schatten2020"]
+description = "Library providing an interface to talk to the schul.cloud api"
+#license = "MIT OR Apache-2.0"
+#homepage = "https://github.com/karthikrathinavel/rustlibrary1"
+#repository = "https://github.com/karthikrathinavel/rustlibrary1"
+
+
+[dependencies]
+reqwest = { version = "0.12.7", features = ["json"] }
+openssl = {version = "0.10.66"}
+base64 = "0.22.1"
+hex = "0.4.3"
+serde_json = "1.0.128"
+rand = "0.8.0"
+serde = { version = "1.0.210", features = ["derive"] }
