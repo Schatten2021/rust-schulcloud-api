@@ -4,9 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Schatten2020"]
 description = "Library providing an interface to talk to the schul.cloud api"
-#license = "MIT OR Apache-2.0"
-#homepage = "https://github.com/karthikrathinavel/rustlibrary1"
-#repository = "https://github.com/karthikrathinavel/rustlibrary1"
+repository = "https://github.com/Schatten2021/rust-schulcloud-api"
 
 
 [dependencies]
