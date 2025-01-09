@@ -1,23 +1,10 @@
-pub mod connection;
-pub mod data;
+use serde::{Deserialize, Serialize};
 
-use serde::Deserialize;
-use serde_json::Value;
+pub mod user;
+pub mod chats;
 
-#[derive(Deserialize, Debug)]
-struct APIResponseStatus {
-    value: String,
-    short_message: String,
-    message: String,
-}
 
-#[derive(Deserialize, Debug)]
-pub struct APIResponse {
-    status: APIResponseStatus,
-    payload: Value,
-    signature: String,
-}
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct DetailedPersonInfo {
     pub id: Option<String>,
     pub first_name: Option<String>,

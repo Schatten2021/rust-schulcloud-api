@@ -1,7 +1,7 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct Channel {
     pub id: String,
     pub name: String,
@@ -16,35 +16,35 @@ pub struct Channel {
     pub last_action: Option<String>,
     pub last_activity: Option<String>,
     pub can_leave: bool,
-    pub ldap_name: Value,
-    pub group_id: Value,
+    pub ldap_name: Option<Value>,
+    pub group_id: Option<Value>,
     pub show_membership_activities: bool,
     pub show_activities: bool,
-    pub crypto_properties: Value,
-    pub unique_identifier: Value,
+    pub crypto_properties: Option<Value>,
+    pub unique_identifier: Option<Value>,
     pub user_count: u64,
     pub pending_count: u64,
     pub request_count: u64,
     pub num_members_without_keys: u64,
     pub key: Option<String>,
-    pub key_requested: Value,
+    pub key_requested: Option<Value>,
     pub manager: bool,
     pub writable: String,
     pub inviteable: String,
     pub membership: ChannelMembership,
     pub favorite: bool,
     pub unread: u64,
-    pub key_signature: Value,
-    pub key_sender: Value,
-    pub signature_expiry: Value,
-    pub mx_room_user_status: Value,
+    pub key_signature: Option<Value>,
+    pub key_sender: Option<Value>,
+    pub signature_expiry: Option<Value>,
+    pub mx_room_user_status: Option<Value>,
     pub mx_room_id: Option<String>,
-    pub mx_room_alias: Value,
-    pub mx_room_server_status: Value,
+    pub mx_room_alias: Option<Value>,
+    pub mx_room_server_status: Option<Value>,
     pub federated: bool,
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct ChannelMembership {
     pub is_member: bool,
     pub invited_at: Value,

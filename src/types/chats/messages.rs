@@ -1,8 +1,8 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use crate::networking::DetailedPersonInfo;
+use crate::types::DetailedPersonInfo;
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct Message {
     pub id: u64,
     pub text: Option<String>,
@@ -23,7 +23,7 @@ pub struct Message {
     pub deleted: Option<String>,
     pub kind: Option<String>,
     pub r#type: Option<String>,
-    pub location: MessageLocation,
+    pub location: Option<MessageLocation>,
     pub is_forwarded: Option<bool>,
     pub metainfo: Option<String>,
     pub messagePayload: Option<Value>,
@@ -42,27 +42,27 @@ pub struct Message {
     pub iv: Option<String>,
     pub reply_to: Option<PossibleReply>,
 }
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum PossibleReply {
     MessageReplyTo(MessageReplyTo),
     Integer(u64),
 }
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum PossibleSender {
     MessageSender(DetailedPersonInfo),
     String(String),
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct MessageLocation {
     pub longitude: Option<Value>,
     pub latitude: Option<Value>,
 }
 
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct MessageSeen {
     pub user_id: Option<String>,
     pub first_name: Option<String>,
@@ -70,14 +70,14 @@ pub struct MessageSeen {
     pub time: u64,
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct MessageReplyTo {
     pub message_id: u64,
     pub message_hash: Option<String>,
     pub message_verification: Option<String>,
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct File {
     pub base_64: Option<String>,
     pub deleted: Option<String>,
@@ -104,7 +104,7 @@ pub struct File {
     pub uploaded: Option<String>,
     pub virtual_folder: Option<Value>,
 }
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct FileDimensions {
     pub height: Option<String>,
     pub width: Option<String>,

@@ -1,8 +1,8 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use crate::networking::DetailedPersonInfo;
+use crate::types::DetailedPersonInfo;
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct Conversation {
     pub id: String,
     pub name: Option<String>,

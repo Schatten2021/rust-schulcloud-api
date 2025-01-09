@@ -1,6 +1,6 @@
 [package]
 name = "schul-cloud-api"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Schatten2020"]
 description = "Library providing an interface to talk to the schul.cloud api"
