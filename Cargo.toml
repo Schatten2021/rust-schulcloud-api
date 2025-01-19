@@ -10,9 +10,12 @@ license = "Apache-2.0"
 
 [dependencies]
 reqwest = { version = "0.12.7", features = ["json"] }
-openssl = {version = "0.10.66"}
+openssl = {version = "0.10.68"}
 base64 = "0.22.1"
 hex = "0.4.3"
 serde_json = "1.0.128"
 rand = "0.8.0"
 serde = { version = "1.0.210", features = ["derive"] }
+
+[features]
+experimental = []

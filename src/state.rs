@@ -11,16 +11,16 @@ use crate::errors::Errors;
 pub struct EncryptionState {
     private_key: Rsa<Private>,
     public_key: Rsa<Public>,
-    // private_signing_key: Rsa<Private>,
-    // public_signing_key: Rsa<Public>,
+    private_signing_key: Rsa<Private>,
+    public_signing_key: Rsa<Public>,
 }
 impl EncryptionState {
-    pub fn new(private_encryption_key: Rsa<Private>, public_encryption_key: Rsa<Public>) -> Self {
+    pub fn new(private_encryption_key: Rsa<Private>, public_encryption_key: Rsa<Public>, private_signing_key: Rsa<Private>, public_signing_key: Rsa<Public>) -> Self {
         Self {
             private_key: private_encryption_key,
             public_key: public_encryption_key,
-            // private_signing_key,
-            // public_signing_key
+            private_signing_key,
+            public_signing_key
         }
     }
     pub fn decrypt(&self, key: String) -> Result<Vec<u8>> {
@@ -35,6 +35,12 @@ impl EncryptionState {
         let encrypted_len = self.private_key.private_encrypt(&*data, &mut *result, Padding::PKCS1_OAEP).map_err(|e| Errors::EncryptionError(e))?;
         result.truncate(encrypted_len);
         Ok(result)
+    }
+    #[cfg(feature = "experimental")]
+    pub fn sign(&self, data: Vec<u8>) -> Result<String> {
+        let mut signer = openssl::sign::Signer::new(openssl::hash::MessageDigest::sha256(), &self.private_key)?;
+        signer.update(&*data)?;
+        Ok(BASE64.encode(signer.sign_to_vec()?))
     }
 }
 #[derive(Clone, Debug)]

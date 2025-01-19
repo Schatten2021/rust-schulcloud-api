@@ -9,7 +9,7 @@ pub struct User {
     pub socket_id: String,
     pub online: bool,
     pub status: Option<Value>,
-    pub user_status: Vec<Value>,
+    pub user_status: Value, //sometimes Vec, sometimes {"active": String, "created": String", "id": String", "name": String, "notifications": String, "user_id": String}
     pub active: String,
     pub deleted: Option<Value>,
     pub allows_voip_calls: bool,
@@ -17,7 +17,7 @@ pub struct User {
     pub mx_user_id: String,
     pub federated: bool,
     pub email: Option<Value>,
-    pub email_validated: String,
+    pub email_validated: Option<String>,
     pub notifications: bool,
     pub device_notifications: bool,
     pub last_login: String,

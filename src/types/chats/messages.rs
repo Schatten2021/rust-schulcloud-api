@@ -41,6 +41,8 @@ pub struct Message {
     pub encrypted: Option<bool>,
     pub iv: Option<String>,
     pub reply_to: Option<PossibleReply>,
+    /// maybe usefull?
+    pub original_text: Option<String>,
 }
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 #[serde(untagged)]

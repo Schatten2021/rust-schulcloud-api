@@ -1,7 +1,12 @@
+use crate::errors::Errors;
 use crate::state::State;
 use crate::types::user::general::UserInfo;
 use crate::types::user::others::User;
 use crate::Result;
+use base64::Engine;
+use openssl::bn::BigNum;
+use openssl::pkey::{Private, Public};
+use openssl::rsa::Rsa;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -66,17 +71,6 @@ impl PrivateKeyRequest {
 pub struct PrivateKeyResponse {
     pub keys: PrivateKeyData
 }
-// impl PrivateKeyResponse {
-//     pub fn get_private_key(&self) -> Result<String> {
-//         let encrypted_data: Value = serde_json::from_str(&*self.keys.private_key).map_err(|e| Errors::JsonDeserializeError(e))?;
-//         let engine = base64::engine::general_purpose::STANDARD;
-//         let iv = engine.decode(encrypted_data["iv"].clone()).map_err(|e| Errors::Base64Error(e))?;
-//         let cipher = engine.decode(encrypted_data["cipher"].clone()).map_err(|e| Errors::Base64Error(e))?;
-//     }
-//     pub fn get_public_key(&self) -> String {
-//         self.keys.public_key.clone()
-//     }
-// }
 #[derive(Debug, Deserialize)]
 pub struct PrivateKeyData {
     pub user_id: String,
@@ -84,14 +78,98 @@ pub struct PrivateKeyData {
     pub format: String,
     pub private_key: String,
     pub public_key: String,
-    pub public_key_signature: String,
+    pub public_key_signature: Option<String>,
     pub time: String,
     pub deleted: Option<Value>,
     pub version: usize,
 }
 #[derive(Debug, Deserialize)]
-pub struct PrivateKey {
+pub struct EncryptedPrivateKeyData {
+    pub iv: String,
+    pub ciphertext: String,
+    pub encryption_func: String,
+    pub key_derivation_properties: Option<KeyDerivationProperties>,
+    pub encryptedKEK: Option<String>,
+}
+#[derive(Debug, Deserialize)]
+pub struct KeyDerivationProperties {
+    pub prf: String,
+    pub iterations: usize,
+    pub salt: String,
+}
+#[derive(Debug, Deserialize)]
+pub struct PemPrivateKey {
     pub private: String
+}
+#[derive(Debug, Deserialize)]
+pub struct RSAPrivateKey {
+    pub n: String,
+    pub e: String,
+    pub d: String,
+    pub p: String,
+    pub q: String,
+    pub dp: String,
+    pub dq: String,
+    pub qi: String,
+}
+impl From<RSAPrivateKey> for Result<Rsa<Private>> {
+    fn from(value: RSAPrivateKey) -> Self {
+        (&value).into()
+    }
+}
+impl From<&RSAPrivateKey> for Result<Rsa<Private>> {
+    fn from(value: &RSAPrivateKey) -> Self {
+        Ok(openssl::rsa::RsaPrivateKeyBuilder::new(
+            to_big_num(value.n.clone())?,
+            to_big_num(value.e.clone())?,
+            to_big_num(value.d.clone())?,
+        )?.set_factors(
+            to_big_num(value.p.clone())?,
+            to_big_num(value.q.clone())?,
+        )?.build())
+    }
+}
+impl RSAPrivateKey {
+    pub fn from_str(private_key: &str) -> Result<RSAPrivateKey> {
+        serde_json::from_str(private_key).map_err(|e| e.into())
+    }
+    pub fn from_decrypted(private_key: Vec<u8>) -> Result<RSAPrivateKey> {
+        Self::from_str(&*String::from_utf8(private_key).map_err(|e| Errors::from(e))?)
+    }
+    pub fn to_key(&self) -> Result<Rsa<Private>> {
+        self.into()
+    }
+}
+fn to_big_num(string: String) -> Result<BigNum> {
+    BigNum::from_slice(&*base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(string)
+        .map_err(|e| Errors::Base64Error(e))?)
+        .map_err(|e| Errors::EncryptionError(e))
+}
+#[derive(Debug, Deserialize)]
+pub struct RSAPublicKey {
+    pub n: String,
+    pub e: String,
+}
+impl RSAPublicKey {
+    pub fn from_str(public_key: &str) -> Result<RSAPublicKey> {
+        serde_json::from_str(public_key).map_err(|e| Errors::from(e))
+    }
+    pub fn to_key(&self) -> Result<Rsa<Public>> {
+        self.into()
+    }
+}
+impl From<&RSAPublicKey> for Result<Rsa<Public>> {
+    fn from(value: &RSAPublicKey) -> Self {
+        openssl::rsa::Rsa::from_public_components(
+            to_big_num(value.n.clone())?,
+            to_big_num(value.e.clone())?,
+        ).map_err(|e| Errors::from(e))
+    }
+}
+impl From<RSAPublicKey> for Result<Rsa<Public>> {
+    fn from(value: RSAPublicKey) -> Self {
+        (&value).to_key()
+    }
 }
 
 #[derive(Serialize)]

@@ -95,7 +95,8 @@ pub struct SendMessageRequest {
     pub files: String,
     pub url: String,
     pub encrypted: String,
-    pub iv: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub iv: Option<String>,
     pub verification: String,
     pub r#type: String,
     pub is_forwarded: String,
@@ -112,7 +113,7 @@ impl SendMessageRequest {
             channel_id: chat_id,
             text,
             files: format!("[{}]", files.join(",")),
-            url: format!("[{}]", url.join(",")),
+            url: format!("[{}]", vec!["null"; url.len()].join(",")), // TODO
             encrypted: encrypted.to_string(),
             iv,
             verification,

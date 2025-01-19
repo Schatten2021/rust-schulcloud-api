@@ -15,13 +15,15 @@ pub(crate) async fn post_request<T: DeserializeOwned>(state: &State, path: impl 
         .form(&data)
         .header("Accept", "application/json")
         .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0")
-        .send().await
-        .map_err(|e| Errors::RequestError(e))?
+        .send().await?
         .json::<APIResponse>().await.map_err(|e| Errors::NotJsonError(e))?;
     if response.status.value != "OK" {
         return Err(Errors::APIError(response.status.value, response.status.short_message, response.status.message))
     }
     // println!("{:?}", response.payload.to_string());
-    T::deserialize(response.payload.into_deserializer())
-        .map_err(|e| { Errors::JsonDeserializeError(e) })
+    T::deserialize(response.payload.clone().into_deserializer())
+        .map_err(|e| {
+            println!("{}", response.payload);
+            Errors::JsonDeserializeError(e)
+        })
 }
