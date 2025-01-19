@@ -39,4 +39,34 @@ impl std::error::Error for Errors {
         }
     }
 }
+impl From<reqwest::Error> for Errors {
+    fn from(e: reqwest::Error) -> Self {
+        Errors::RequestError(e)
+    }
+}
+impl From<serde_json::Error> for Errors {
+    fn from(e: serde_json::Error) -> Self {
+        Errors::JsonDeserializeError(e)
+    }
+}
+impl From<openssl::error::ErrorStack> for Errors {
+    fn from(e: openssl::error::ErrorStack) -> Self {
+        Errors::EncryptionError(e)
+    }
+}
+impl From<base64::DecodeError> for Errors {
+    fn from(e: base64::DecodeError) -> Self {
+        Errors::Base64Error(e)
+    }
+}
+impl From<hex::FromHexError> for Errors {
+    fn from(e: hex::FromHexError) -> Self {
+        Errors::HexError(e)
+    }
+}
+impl From<FromUtf8Error> for Errors {
+    fn from(e: FromUtf8Error) -> Self {
+        Errors::StringDecodeError(e)
+    }
+}
 pub type Result<T> = std::result::Result<T, Errors>;
