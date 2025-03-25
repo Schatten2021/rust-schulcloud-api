@@ -84,7 +84,6 @@ pub struct UserSettings {
     pub can_report_users: bool,
     pub can_report_messages: bool,
     pub access_restrictions: AccessRestrictions,
-    pub translate_messages: bool,
 }
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 #[serde(untagged)]

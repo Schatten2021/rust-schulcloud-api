@@ -1,13 +1,14 @@
+#![allow(dead_code)]
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
-use openssl::pkey::{Private, Public};
+use openssl::pkey::{PKey, Private, Public};
 use openssl::rsa::{Padding, Rsa};
 use crate::Result;
-use rand::distributions::Alphanumeric;
+use rand::distr::Alphanumeric;
 use rand::Rng;
 use crate::errors::Errors;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EncryptionState {
     private_key: Rsa<Private>,
     public_key: Rsa<Public>,
@@ -38,7 +39,8 @@ impl EncryptionState {
     }
     #[cfg(feature = "experimental")]
     pub fn sign(&self, data: Vec<u8>) -> Result<String> {
-        let mut signer = openssl::sign::Signer::new(openssl::hash::MessageDigest::sha256(), &self.private_key)?;
+        let key = PKey::from_rsa(self.private_key.clone())?;
+        let mut signer = openssl::sign::Signer::new(openssl::hash::MessageDigest::sha256(), &key)?;
         signer.update(&*data)?;
         Ok(BASE64.encode(signer.sign_to_vec()?))
     }
@@ -50,7 +52,7 @@ pub struct State {
     pub client_key: Option<String>,
 }
 impl State {
-    pub(crate) fn build_url(&self, path: impl ToString) -> String {
+    pub fn build_url(&self, path: impl ToString) -> String {
         let path = path.to_string();
         let base = if self.base_url.ends_with('/') {
             self.base_url.clone()
@@ -65,7 +67,7 @@ impl State {
     pub(crate) fn get_device_id(&self) -> String {self.device_id.clone()}
 }
 impl State {
-    pub fn new(mut base_url: String, device_id: String, client_key: Option<String>) -> Self {
+    pub fn new(base_url: String, device_id: String, client_key: Option<String>) -> Self {
         let base_url = if base_url.starts_with("http://") || base_url.starts_with("https://") {
             base_url
         } else {
@@ -82,7 +84,7 @@ impl Default for State {
     fn default() -> Self {
         Self {
             base_url: "https://api.stashcat.com/".into(),
-            device_id: rand::thread_rng().sample_iter(&Alphanumeric).take(32).map(char::from).collect(),
+            device_id: rand::rng().sample_iter(&Alphanumeric).take(32).map(char::from).collect(),
             client_key: None,
         }
     }

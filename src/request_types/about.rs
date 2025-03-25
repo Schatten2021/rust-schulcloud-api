@@ -131,10 +131,10 @@ impl From<&RSAPrivateKey> for Result<Rsa<Private>> {
 }
 impl RSAPrivateKey {
     pub fn from_str(private_key: &str) -> Result<RSAPrivateKey> {
-        serde_json::from_str(private_key).map_err(|e| e.into())
+        serde_json::from_str(private_key).map_err(Errors::from)
     }
     pub fn from_decrypted(private_key: Vec<u8>) -> Result<RSAPrivateKey> {
-        Self::from_str(&*String::from_utf8(private_key).map_err(|e| Errors::from(e))?)
+        Self::from_str(&*String::from_utf8(private_key)?)
     }
     pub fn to_key(&self) -> Result<Rsa<Private>> {
         self.into()
@@ -181,12 +181,12 @@ pub struct OtherUserInfoRequest {
 }
 impl OtherUserInfoRequest {
     pub fn new(state: &State, user_id: String, with_key: bool) -> Result<Self> {
-        Ok((Self {
+        Ok(Self {
             client_key: state.expect_client_key()?,
             device_id: state.get_device_id(),
             user_id,
             withkey: with_key,
-        }))
+        })
     }
 }
 #[derive(Debug, Deserialize)]
